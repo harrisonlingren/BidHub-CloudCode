@@ -32,11 +32,12 @@ Parse.Cloud.beforeSave("NewBid", function(request, response) {
 			}
 
 			// Make sure the bid increments by at least the minimum increment
-            minIncrement = item.get("priceIncrement");
+			// Parse likes to return strings not numbers, hence the Number() function
+            minIncrement = Number(item.get("priceIncrement"));
             if (!minIncrement) {
                 minIncrement = 1;
             }
-			if (currentBid.get("amt") < (item.get("currentPrice") + minIncrement )) {
+			if (Number(currentBid.get("amt")) < (Number(item.get("currentPrice")) + minIncrement )) {
 				response.error("You need to raise the current price by at least $" + minIncrement);
 				return;
 			}
@@ -194,7 +195,7 @@ Parse.Cloud.beforeSave("NewBid", function(request, response) {
 		    response.error("Error: " + error.code + " " + error.message);
 		}
 	});
-	
+
 });
 
 // This code is run after the successful save of a new bid.
@@ -216,7 +217,7 @@ Parse.Cloud.afterSave("NewBid", function(request, response) {
 			var index = previousWinners.indexOf(currentBid.get("email"));
 			if (index > -1) {
 				previousWinners.splice(index, 1);
-			}	
+			}
 
 			// Grab installations where that user was previously a winner but no longer is.
 			var query = new Parse.Query(Parse.Installation);
@@ -251,7 +252,7 @@ Parse.Cloud.afterSave("NewBid", function(request, response) {
 			  }
 			});
 
-		}, 
+		},
 		error: function(error) {
 		    console.error("Push failed: " +error)
 		}
